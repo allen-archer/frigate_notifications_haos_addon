@@ -36,6 +36,10 @@
 
 `frigate_url`: The URL to your Frigate instance. For example, "http://frigate.com" or "http://127.0.0.1:5000". HTTPS works as well if you have that configured.
 
+`disabled_cameras`: Optional. A list of cameras to ignore or filter. Each entry requires a `camera_name`. You can optionally provide a list of `disabled_objects` (e.g., "car", "person") to disable only specific objects for that camera. If the labels list is empty, all objects for that camera will be ignored.
+
+`disabled_objects`: Optional. A list of objects to ignore or filter completely (e.g., "car", "person").
+
 `snapshot_options`: Optional. The options sent to the Frigate API when requesting a snapshot. Documentation can be found [here](https://docs.frigate.video/integrations/api#get-apieventsidsnapshotjpg).
 
 ### MQTT

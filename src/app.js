@@ -7,6 +7,8 @@ let mqttClient;
 let lastNotificationDate;
 let tagsMap;
 let supervisorToken;
+let disabledCameras;
+let disabledObjects;
 
 async function initialize() {
   const configFile = fs.readFileSync('./data/options.json', 'utf-8');
@@ -17,10 +19,18 @@ async function initialize() {
   } else if (config.ntfy_token) {
     config.ntfy_token = `Bearer ${config.ntfy_token}`;
   }
-  config.ntfy_tags.forEach(tag => {
+  config.ntfy_tags?.forEach(tag => {
     tagsMap.set(tag.object, tag.tags);
   });
   supervisorToken = process.env.TOKEN;
+  disabledCameras = new Map();
+  config.disabled_cameras?.forEach(camera => {
+    disabledCameras.set(camera.camera_name, camera.disabled_objects)
+  });
+  disabledObjects = new Set();
+  config.disabled_objects?.forEach(disabledObject => {
+    disabledObjects.add(disabledObject)
+  });
   try {
     const mqttOptions = {};
     mqttOptions.port = config.mqtt_port;
@@ -41,9 +51,22 @@ async function initialize() {
       const event = JSON.parse(payload.toString());
       const before = event.before;
       const after = event.after;
-      const type = event.type;
+      const camera = after.camera;
+      const label = after.label;
       if (!before?.has_snapshot && after?.has_snapshot) {
-        sendNotification(after.camera, after.label, after.id);
+        let doSendNotification = true;
+        if (disabledCameras.has(camera)) {
+          const disabledObjects = disabledCameras.get(camera);
+          if (disabledObjects === null || disabledObjects.includes(label)) {
+            doSendNotification = false;
+          }
+        }
+        if (doSendNotification && disabledObjects.has(label)) {
+          doSendNotification = false;
+        }
+        if (doSendNotification) {
+          sendNotification(camera, label, after.id);
+        }
       }
     });
   } catch (e) {

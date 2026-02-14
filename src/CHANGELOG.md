@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.1.2] - 2026-02-14
+
+- Added optional ability to disable cameras or objects from sending notifications.
+
 ## [1.1.1] - 2024-11-25
 
 - Fixed a small issue with the config.yaml format
