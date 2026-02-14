@@ -25,11 +25,15 @@ async function initialize() {
   supervisorToken = process.env.TOKEN;
   disabledCameras = new Map();
   config.disabled_cameras?.forEach(camera => {
-    disabledCameras.set(camera.camera_name, camera.disabled_objects)
+    const objects = new Set();
+    camera.disabled_objects?.forEach (object => {
+      objects.add(object.toLowerCase())
+    });
+    disabledCameras.set(camera.camera_name.toLowerCase(), objects);
   });
   disabledObjects = new Set();
   config.disabled_objects?.forEach(disabledObject => {
-    disabledObjects.add(disabledObject)
+    disabledObjects.add(disabledObject.toLowerCase())
   });
   try {
     const mqttOptions = {};
@@ -55,13 +59,13 @@ async function initialize() {
       const label = after.label;
       if (!before?.has_snapshot && after?.has_snapshot) {
         let doSendNotification = true;
-        if (disabledCameras.has(camera)) {
+        if (disabledCameras.has(camera.toLowerCase())) {
           const disabledObjects = disabledCameras.get(camera);
-          if (disabledObjects === null || disabledObjects.includes(label)) {
+          if (disabledObjects.length === 0 || disabledObjects.has(label.toLowerCase())) {
             doSendNotification = false;
           }
         }
-        if (doSendNotification && disabledObjects.has(label)) {
+        if (doSendNotification && disabledObjects.has(label.toLowerCase())) {
           doSendNotification = false;
         }
         if (doSendNotification) {
