@@ -9,6 +9,7 @@ let tagsMap;
 let supervisorToken;
 let disabledCameras;
 let disabledObjects;
+let debugLogging;
 
 async function initialize() {
   const configFile = fs.readFileSync('./data/options.json', 'utf-8');
@@ -35,6 +36,11 @@ async function initialize() {
   config.disabled_objects?.forEach(disabledObject => {
     disabledObjects.add(disabledObject.toLowerCase())
   });
+  debugLogging = config.debug_logging;
+  if (debugLogging) {
+    console.log('Disabled cameras: ' + JSON.stringify(Object.fromEntries(Array.from(disabledCameras, ([key, value]) => [key, [...value]])), null, 2));
+    console.log('Disabled objects: ' + JSON.stringify(disabledObjects, null, 2));
+  }
   try {
     const mqttOptions = {};
     mqttOptions.port = config.mqtt_port;
@@ -57,16 +63,34 @@ async function initialize() {
       const after = event.after;
       const camera = after.camera;
       const label = after.label;
+      if (debugLogging) {
+        console.log(`Event: camera=${camera}, label=${label}`);
+      }
       if (!before?.has_snapshot && after?.has_snapshot) {
         let doSendNotification = true;
         if (disabledCameras.has(camera.toLowerCase())) {
+          console.log(`Dsiabled cameras does have ${camera.toLowerCase()}`);
           const disabledObjects = disabledCameras.get(camera);
-          if (disabledObjects.length === 0 || disabledObjects.has(label.toLowerCase())) {
+          if (disabledObjects.length === 0) {
             doSendNotification = false;
+            console.log(`Disabled cameras -> disabled objects is empty`);
           }
+          if (disabledObjects.has(label.toLowerCase())) {
+            doSendNotification = false;
+            console.log(`Disabled cameras -> disabled objects does have ${label.toLowerCase()}`);
+          } else {
+            console.log(`Disabled cameras -> disabled objects does not have ${label.toLowerCase()}`);
+          }
+        } else if (debugLogging) {
+          console.log(`Disabled cameras does not have ${camera.toLowerCase()}`);
         }
-        if (doSendNotification && disabledObjects.has(label.toLowerCase())) {
+        if (disabledObjects.has(label.toLowerCase())) {
+          if (debugLogging) {
+            console.log(`Disabled objects does have ${label.toLowerCase()}`);
+          }
           doSendNotification = false;
+        } else if (debugLogging) {
+          console.log(`Disabled objects does not have ${label.toLowerCase()}`);
         }
         if (doSendNotification) {
           sendNotification(camera, label, after.id);

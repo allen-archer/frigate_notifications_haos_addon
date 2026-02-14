@@ -1,6 +1,6 @@
 name: "Frigate Notifications"
 description: "Sends notifications when Frigate detects objects"
-version: "1.1.2-beta-2"
+version: "1.1.2-beta-3"
 slug: "frigate_notifications"
 arch:
   - aarch64
@@ -52,6 +52,7 @@ options:
   mqtt_topic: "frigate/events"
   mqtt_username: ""
   mqtt_password: ""
+  debug_logging: false
 schema:
   ntfy_enabled: bool
   ntfy_url: url
@@ -87,3 +88,4 @@ schema:
   mqtt_topic: str
   mqtt_username: str?
   mqtt_password: str?
+  debug_logging: bool
