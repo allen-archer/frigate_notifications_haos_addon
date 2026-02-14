@@ -1,6 +1,6 @@
 name: "Frigate Notifications"
 description: "Sends notifications when Frigate detects objects"
-version: "1.1.1"
+version: "1.2.0"
 slug: "frigate_notifications"
 arch:
   - aarch64
@@ -32,6 +32,15 @@ options:
   ha_enabled: true
   ha_entity_ids:
   frigate_url: "https://frigate.com"
+  disabled_cameras:
+    - camera_name: "front"
+    - camera_name: "back"
+      disabled_objects:
+        - "car"
+        - "person"
+  disabled_objects:
+    - "car"
+    - "person"
   snapshot_options:
     bbox: 1
     timestamp: 1
@@ -61,6 +70,12 @@ schema:
   ha_entity_ids:
     - str?
   frigate_url: url
+  disabled_cameras:
+    - camera_name: str
+      disabled_objects:
+        - str?
+  disabled_objects:
+    - str?
   snapshot_options:
     bbox: int?
     timestamp: int?
