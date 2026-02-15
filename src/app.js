@@ -74,6 +74,8 @@ async function initialize() {
           if (objects.length === 0) {
             doSendNotification = false;
             console.log(`Disabled cameras -> disabled objects is empty`);
+          } else {
+            console.log(`Disabled cameras -> disabled objects =${JSON.stringify(objects, null, 2)}`);
           }
           if (objects.has(label.toLowerCase())) {
             doSendNotification = false;
