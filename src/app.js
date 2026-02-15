@@ -69,13 +69,13 @@ async function initialize() {
       if (!before?.has_snapshot && after?.has_snapshot) {
         let doSendNotification = true;
         if (disabledCameras.has(camera.toLowerCase())) {
-          console.log(`Dsiabled cameras does have ${camera.toLowerCase()}`);
-          const disabledObjects = disabledCameras.get(camera);
-          if (disabledObjects.length === 0) {
+          console.log(`Disabled cameras does have ${camera.toLowerCase()}`);
+          const objects = disabledCameras.get(camera);
+          if (objects.length === 0) {
             doSendNotification = false;
             console.log(`Disabled cameras -> disabled objects is empty`);
           }
-          if (disabledObjects.has(label.toLowerCase())) {
+          if (objects.has(label.toLowerCase())) {
             doSendNotification = false;
             console.log(`Disabled cameras -> disabled objects does have ${label.toLowerCase()}`);
           } else {

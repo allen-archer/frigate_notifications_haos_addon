@@ -1,6 +1,6 @@
 name: "Frigate Notifications"
 description: "Sends notifications when Frigate detects objects"
-version: "1.1.2-beta-3"
+version: "1.1.2-beta-4"
 slug: "frigate_notifications"
 arch:
   - aarch64
