@@ -27,7 +27,7 @@ async function initialize() {
   disabledCameras = new Map();
   config.disabled_cameras?.forEach(camera => {
     const objects = new Set();
-    camera.disabled_objects?.forEach (object => {
+    camera.disabled_objects?.forEach(object => {
       objects.add(object.toLowerCase())
     });
     disabledCameras.set(camera.camera_name.toLowerCase(), objects);
@@ -63,36 +63,32 @@ async function initialize() {
       const after = event.after;
       const camera = after.camera;
       const label = after.label;
-      if (debugLogging) {
-        console.log(`Event: camera=${camera}, label=${label}`);
-      }
       if (!before?.has_snapshot && after?.has_snapshot) {
+        debugLog(`Event: camera=${camera}, label=${label}`);
         let doSendNotification = true;
         if (disabledCameras.has(camera.toLowerCase())) {
-          console.log(`Disabled cameras does have ${camera.toLowerCase()}`);
+          debugLog(`Disabled cameras does have ${camera.toLowerCase()}`);
           const objects = disabledCameras.get(camera);
-          if (objects.length === 0) {
+          if (objects.size === 0) {
             doSendNotification = false;
-            console.log(`Disabled cameras -> disabled objects is empty`);
+            debugLog(`Disabled cameras -> disabled objects is empty, suppressing notification`);
           } else {
-            console.log(`Disabled cameras -> disabled objects =${JSON.stringify(objects, null, 2)}`);
+            debugLog(`Disabled cameras -> disabled objects =${JSON.stringify(objects, null, 2)}`);
           }
           if (objects.has(label.toLowerCase())) {
             doSendNotification = false;
-            console.log(`Disabled cameras -> disabled objects does have ${label.toLowerCase()}`);
+            debugLog(`Disabled cameras -> disabled objects does have ${label.toLowerCase()}, suppressing notification`);
           } else {
-            console.log(`Disabled cameras -> disabled objects does not have ${label.toLowerCase()}`);
+            debugLog(`Disabled cameras -> disabled objects does not have ${label.toLowerCase()}`);
           }
-        } else if (debugLogging) {
-          console.log(`Disabled cameras does not have ${camera.toLowerCase()}`);
+        } else {
+          debugLog(`Disabled cameras does not have ${camera.toLowerCase()}`);
         }
         if (disabledObjects.has(label.toLowerCase())) {
-          if (debugLogging) {
-            console.log(`Disabled objects does have ${label.toLowerCase()}`);
-          }
+          debugLog(`Disabled objects does have ${label.toLowerCase()}`);
           doSendNotification = false;
-        } else if (debugLogging) {
-          console.log(`Disabled objects does not have ${label.toLowerCase()}`);
+        } else {
+          debugLog(`Disabled objects does not have ${label.toLowerCase()}`);
         }
         if (doSendNotification) {
           sendNotification(camera, label, after.id);
@@ -101,6 +97,12 @@ async function initialize() {
     });
   } catch (e) {
     console.error(`Error connecting to MQTT broker at ${config.mqtt_address}: ${e}`);
+  }
+}
+
+function debugLog(message) {
+  if (debugLogging) {
+    console.log(message);
   }
 }
 
