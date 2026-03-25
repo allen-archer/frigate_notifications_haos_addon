@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.3.0-test] - 2026-3-25
+
+- Converting from Node.js to Kotlin
+
 ## [1.2.0] - 2026-02-14
 
 - Added optional ability to disable cameras or objects from sending notifications.
