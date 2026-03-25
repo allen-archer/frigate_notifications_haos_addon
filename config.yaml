@@ -1,13 +1,11 @@
 name: "Frigate Notifications"
 description: "Sends notifications when Frigate detects objects"
-version: "1.2.0"
+version: "1.3.0"
 slug: "frigate_notifications"
+image: ghcr.io/allen-archer/frigate_notifications_haos_addon/{arch}
 arch:
   - aarch64
   - amd64
-  - armhf
-  - armv7
-  - i386
 startup: application
 init: false
 apparmor: true
@@ -52,6 +50,7 @@ options:
   mqtt_topic: "frigate/events"
   mqtt_username: ""
   mqtt_password: ""
+  log_level: "error"
 schema:
   ntfy_enabled: bool
   ntfy_url: url
@@ -87,3 +86,4 @@ schema:
   mqtt_topic: str
   mqtt_username: str?
   mqtt_password: str?
+  log_level: list(error|info|debug)
