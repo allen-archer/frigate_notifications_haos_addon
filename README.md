@@ -36,4 +36,4 @@ In Home Assistant, go to Settings -> Add-ons -> Add-on store -> ... button (top 
 
 Once added, you will see the "Frigate Notifications" add-on in the list of available add-ons.  Click on that, then click "Install".
 
-Then go to the "Configuration" tab and fill in the required fields. See the [documentation](src/DOCS.md) for more information.
+Then go to the "Configuration" tab and fill in the required fields. See the [documentation](DOCS.md) for more information.
