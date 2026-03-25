@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.3.0] - 2026-3-30
+
+- Converting from Node.js to Kotlin
+- Added logging verbosity config
+- Updated build process to build images and release them as packages as opposed to building the image locally on install
+
 ## [1.2.0] - 2026-02-14
 
 - Added optional ability to disable cameras or objects from sending notifications.
