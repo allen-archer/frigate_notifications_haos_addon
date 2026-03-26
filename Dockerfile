@@ -7,8 +7,7 @@ COPY build.gradle settings.gradle ./
 COPY src/main/ src/main/
 RUN chmod +x gradlew && ./gradlew copyDependencies jar -x test
 
-ARG JAVA_BASE=eclipse-temurin:17-jre
-FROM $JAVA_BASE AS java-provider
+FROM eclipse-temurin:17-jre AS java-provider
 
 FROM $BUILD_FROM
 COPY --from=java-provider /opt/java/openjdk /opt/java/openjdk
