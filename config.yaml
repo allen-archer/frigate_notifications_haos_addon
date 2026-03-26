@@ -2,6 +2,7 @@ name: "Frigate Notifications"
 description: "Sends notifications when Frigate detects objects"
 version: "1.3.0-test"
 slug: "frigate_notifications"
+image: ghcr.io/allen-archer/frigate_notifications_haos_addon/{arch}
 arch:
   - aarch64
   - amd64
