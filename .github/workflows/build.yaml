@@ -19,15 +19,9 @@ jobs:
           - arch: aarch64
             build_from: homeassistant/aarch64-base:latest
             platform: linux/arm64
-          - arch: armhf
-            build_from: homeassistant/armhf-base:latest
-            platform: linux/arm/v6
           - arch: armv7
             build_from: homeassistant/armv7-base:latest
             platform: linux/arm/v7
-          - arch: i386
-            build_from: homeassistant/i386-base:latest
-            platform: linux/386
     steps:
       - uses: actions/checkout@v4
       - uses: docker/setup-qemu-action@v3
