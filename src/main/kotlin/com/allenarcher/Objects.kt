@@ -83,5 +83,6 @@ data class Config(
     @SerialName("mqtt_port") val mqttPort: Int? = null,
     @SerialName("mqtt_topic") val mqttTopic: String,
     @SerialName("mqtt_username") val mqttUsername: String? = null,
-    @SerialName("mqtt_password") val mqttPassword: String? = null
+    @SerialName("mqtt_password") val mqttPassword: String? = null,
+    @SerialName("log_level") val logLevel: String = "error"
 )

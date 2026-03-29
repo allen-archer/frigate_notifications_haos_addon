@@ -21,6 +21,7 @@ import java.util.Date
 val json = Json { ignoreUnknownKeys = true }
 val httpClient: HttpClient = HttpClient.newHttpClient()
 lateinit var config: Config
+lateinit var logLevel: LogLevel
 var ntfyAuth: String? = null
 val tagsMap = mutableMapOf<String, String>()
 val disabledCameras = mutableMapOf<String, Set<String>>()
@@ -32,6 +33,7 @@ var lastNotificationDate: Date? = null
 
 fun main() {
     config = json.decodeFromString(File("./data/options.json").readText())
+    logLevel = LogLevel.valueOf(config.logLevel.uppercase())
 
     if (!config.ntfyUser.isNullOrEmpty() && !config.ntfyPassword.isNullOrEmpty()) {
         val encoded = Base64.getEncoder().encodeToString("${config.ntfyUser}:${config.ntfyPassword}".toByteArray())
@@ -62,7 +64,7 @@ fun main() {
         val client = MqttClient(brokerUrl, MqttClient.generateClientId(), MemoryPersistence())
         client.setCallback(object : MqttCallback {
             override fun connectionLost(cause: Throwable?) {
-                System.err.println("MQTT connection lost: ${cause?.message}")
+                logError("MQTT connection lost: ${cause?.message}")
             }
             override fun messageArrived(topic: String, message: MqttMessage) {
                 handleMessage(message.toString())
@@ -71,12 +73,12 @@ fun main() {
         })
         client.connect(mqttOptions)
         client.subscribe(config.mqttTopic)
-        println("Connected to MQTT at '${config.mqttAddress}'")
-        println("Subscribed to topic '${config.mqttTopic}'")
+        logInfo("Connected to MQTT at '${config.mqttAddress}'")
+        logInfo("Subscribed to topic '${config.mqttTopic}'")
 
         Thread.currentThread().join()
     } catch (e: Exception) {
-        System.err.println("Error connecting to MQTT broker at ${config.mqttAddress}: $e")
+        logError("Error connecting to MQTT broker at ${config.mqttAddress}: $e")
     }
 }
 
@@ -85,6 +87,7 @@ fun handleMessage(payload: String) {
     val camera = event.after.camera
     val label = event.after.label
     val id = event.after.id
+    logDebug("Message received: camera=$camera, label=$label, id=$id, before.hasSnapshot=${event.before.hasSnapshot}, after.hasSnapshot=${event.after.hasSnapshot}")
 
     if (!event.before.hasSnapshot && event.after.hasSnapshot) {
         val cameraLower = camera.lowercase()
@@ -102,6 +105,7 @@ fun handleMessage(payload: String) {
 }
 
 fun sendNotification(camera: String, label: String, id: String) {
+    logDebug("Sending notification: camera=$camera, label=$label, id=$id")
     if (config.ntfyEnabled) {
         sendNtfyNotification(camera, label, id)
     }
@@ -141,10 +145,10 @@ fun sendNtfyNotification(camera: String, label: String, id: String) {
     try {
         val response = httpClient.send(requestBuilder.build(), HttpResponse.BodyHandlers.discarding())
         if (response.statusCode() != 200) {
-            System.err.println("Non-successful response from ntfy request: ${response.statusCode()}")
+            logError("Non-successful response from ntfy request: ${response.statusCode()}")
         }
     } catch (e: Exception) {
-        System.err.println("Error sending request to ntfy at ${config.ntfyUrl}: $e")
+        logError("Error sending request to ntfy at ${config.ntfyUrl}: $e")
     }
 }
 
@@ -168,10 +172,10 @@ fun sendHaNotification(camera: String, label: String, id: String, entityId: Stri
     try {
         val response = httpClient.send(request, HttpResponse.BodyHandlers.discarding())
         if (response.statusCode() != 200) {
-            System.err.println("Non-successful response from Home Assistant API request: ${response.statusCode()}")
+            logError("Non-successful response from Home Assistant API request: ${response.statusCode()}")
         }
     } catch (e: Exception) {
-        System.err.println("Error sending request to Home Assistant: $e")
+        logError("Error sending request to Home Assistant: $e")
     }
 }
 
