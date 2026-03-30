@@ -54,6 +54,10 @@
 
 `mqtt_password`: Optional. The password to connect to the MQTT broker with.
 
+### Misc options
+
+`log_level`: The verbosity of the logs. Default is 'error' and will log the least. 'debug' is useful for development or troubleshooting.
+
 ## Running the addon
 
 Once you have configured the addon, click "Start" to start the addon. You can view the logs by clicking on the "Logs" tab. The logs should show any errors the addon encountered.
