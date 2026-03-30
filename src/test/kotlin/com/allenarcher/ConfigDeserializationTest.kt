@@ -44,7 +44,8 @@ class ConfigDeserializationTest {
           "mqtt_port": 1883,
           "mqtt_topic": "frigate/events",
           "mqtt_username": "user",
-          "mqtt_password": "pass"
+          "mqtt_password": "pass",
+          "log_level": "debug"
         }
     """.trimIndent()
 
@@ -69,6 +70,7 @@ class ConfigDeserializationTest {
         assertEquals("frigate/events", config.mqttTopic)
         assertEquals("user", config.mqttUsername)
         assertEquals("pass", config.mqttPassword)
+        assertEquals("debug", config.logLevel)
     }
 
     @Test
@@ -151,5 +153,18 @@ class ConfigDeserializationTest {
         assertNull(config.mqttPort)
         assertNull(config.mqttUsername)
         assertNull(config.mqttPassword)
+        assertEquals("error", config.logLevel)
+    }
+
+    @Test
+    fun `snapshot options toQueryString formats correctly`() {
+        val full = SnapshotOptions(bbox = 1, timestamp = 1, crop = 1, h = 480, quality = 90)
+        assertEquals("?bbox=1&timestamp=1&crop=1&h=480&quality=90", full.toQueryString())
+
+        val partial = SnapshotOptions(h = 320, quality = 75)
+        assertEquals("?h=320&quality=75", partial.toQueryString())
+
+        val empty = SnapshotOptions()
+        assertEquals("", empty.toQueryString())
     }
 }
