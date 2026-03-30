@@ -58,7 +58,24 @@ data class SnapshotOptions(
     val crop: Int? = null,
     val h: Int? = null,
     val quality: Int? = null
-)
+) {
+    fun toQueryString(): String {
+        val params = buildList {
+            bbox?.let { add("bbox=$it") }
+            timestamp?.let { add("timestamp=$it") }
+            crop?.let { add("crop=$it") }
+            h?.let { add("h=$it") }
+            quality?.let { add("quality=$it") }
+        }
+        return if (params.isEmpty()) "" else "?" + params.joinToString("&")
+    }
+}
+
+@Serializable
+data class HaNotificationData(val image: String, @SerialName("clickAction") val clickAction: String)
+
+@Serializable
+data class HaNotification(val title: String, val message: String, val data: HaNotificationData)
 
 @Serializable
 data class Config(
