@@ -1,5 +1,6 @@
+# syntax=docker/dockerfile:1
 ARG BUILD_FROM
-FROM --platform=linux/amd64 eclipse-temurin:17-jdk-alpine AS builder
+FROM --platform=$BUILDPLATFORM eclipse-temurin:17-jdk-alpine AS builder
 WORKDIR /build
 COPY gradlew ./
 COPY gradle/ gradle/
