@@ -3,7 +3,7 @@ package com.allenarcher
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken
-import org.eclipse.paho.client.mqttv3.MqttCallback
+import org.eclipse.paho.client.mqttv3.MqttCallbackExtended
 import org.eclipse.paho.client.mqttv3.MqttClient
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions
 import org.eclipse.paho.client.mqttv3.MqttMessage
@@ -66,7 +66,11 @@ fun main() {
     }
     try {
         val client = MqttClient(brokerUrl, MqttClient.generateClientId(), MemoryPersistence())
-        client.setCallback(object : MqttCallback {
+        client.setCallback(object : MqttCallbackExtended {
+            override fun connectComplete(reconnect: Boolean, serverURI: String?) {
+                client.subscribe(config.mqttTopic)
+                if (reconnect) logInfo("Reconnected to MQTT and re-subscribed to '${config.mqttTopic}'")
+            }
             override fun connectionLost(cause: Throwable?) {
                 logError("MQTT connection lost: ${cause?.message}")
             }
@@ -76,9 +80,7 @@ fun main() {
             override fun deliveryComplete(token: IMqttDeliveryToken?) {}
         })
         client.connect(mqttOptions)
-        client.subscribe(config.mqttTopic)
         logInfo("Connected to MQTT at '${config.mqttAddress}'")
-        logInfo("Subscribed to topic '${config.mqttTopic}'")
         // This blocks the main thread because MQTT runs on its own thread
         Thread.currentThread().join()
     } catch (e: Exception) {

@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.3.1] - 2026-6-25
+
+- Updated the MQTT connection to resubscribe to the topic on reconnect
+
 ## [1.3.0] - 2026-3-30
 
 - Converting from Node.js to Kotlin
