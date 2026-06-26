@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.3.2] - 2026-6-25
+
+- Removing auto-reconnect and adding a manual reconnect loop
+
 ## [1.3.1] - 2026-6-25
 
 - Updated the MQTT connection to resubscribe to the topic on reconnect

@@ -3,7 +3,7 @@ package com.allenarcher
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken
-import org.eclipse.paho.client.mqttv3.MqttCallbackExtended
+import org.eclipse.paho.client.mqttv3.MqttCallback
 import org.eclipse.paho.client.mqttv3.MqttClient
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions
 import org.eclipse.paho.client.mqttv3.MqttMessage
@@ -55,7 +55,6 @@ fun main() {
     val brokerUrl = "${config.mqttAddress}:${config.mqttPort ?: 1883}"
     // Setup the MQTT client
     val mqttOptions = MqttConnectOptions().apply {
-        isAutomaticReconnect = true
         isCleanSession = true
         if (!config.mqttUsername.isNullOrEmpty()) {
             userName = config.mqttUsername
@@ -66,13 +65,21 @@ fun main() {
     }
     try {
         val client = MqttClient(brokerUrl, MqttClient.generateClientId(), MemoryPersistence())
-        client.setCallback(object : MqttCallbackExtended {
-            override fun connectComplete(reconnect: Boolean, serverURI: String?) {
-                client.subscribe(config.mqttTopic)
-                if (reconnect) logInfo("Reconnected to MQTT and re-subscribed to '${config.mqttTopic}'")
-            }
+        client.setCallback(object : MqttCallback {
             override fun connectionLost(cause: Throwable?) {
                 logError("MQTT connection lost: ${cause?.message}")
+                Thread {
+                    while (!client.isConnected) {
+                        try {
+                            Thread.sleep(5000)
+                            client.connect(mqttOptions)
+                            client.subscribe(config.mqttTopic)
+                            logInfo("Reconnected to MQTT and re-subscribed to '${config.mqttTopic}'")
+                        } catch (e: Exception) {
+                            logError("Reconnect attempt failed: ${e.message}")
+                        }
+                    }
+                }.start()
             }
             override fun messageArrived(topic: String, message: MqttMessage) {
                 handleMessage(message.toString())
@@ -80,7 +87,8 @@ fun main() {
             override fun deliveryComplete(token: IMqttDeliveryToken?) {}
         })
         client.connect(mqttOptions)
-        logInfo("Connected to MQTT at '${config.mqttAddress}'")
+        client.subscribe(config.mqttTopic)
+        logInfo("Connected to MQTT at '${config.mqttAddress}' and subscribed to '${config.mqttTopic}'")
         // This blocks the main thread because MQTT runs on its own thread
         Thread.currentThread().join()
     } catch (e: Exception) {
